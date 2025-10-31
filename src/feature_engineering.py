@@ -13,102 +13,135 @@ def feature_extract_web_visits(path = 'data/web_visits.csv'):
     
     web_visits = pd.read_csv(path)
     
-    diet_titles = [
+    related_titles = [
         'High-fiber meals', 
         'Cholesterol friendly foods', 
         'Mediterranean diet',
         'Healthy eating guide', 
-        'Weight management'
-    ]
-
-    physical_activity_titles = [
+        'Weight management',
         'Aerobic exercise',
         'Exercise routines', 
         'Strength training basics', 
-        'Cardio workouts'
-    ]
-
-    sleep_health_titles = [
+        'Cardio workouts',
         'Restorative sleep tips', 
-        'Sleep hygiene'
-    ]
-
-    resilience_wellbeing_titles = [
+        'Sleep hygiene',
         'Stress reduction',
-        'Meditation guide'
-    ]
-
-    clinical_titles = [
+        'Meditation guide',
         'Diabetes management',
         'Hypertension basics',
         'Lowering blood pressure',
         'Cardiometabolic health',
         'HbA1c targets'
     ]
-
-    # Create category columns
-    web_visits['is_diet'] = web_visits['title'].isin(diet_titles)
-    web_visits['is_physical_activity'] = web_visits['title'].isin(physical_activity_titles)
-    web_visits['is_sleep'] = web_visits['title'].isin(sleep_health_titles)
-    web_visits['is_resilience'] = web_visits['title'].isin(resilience_wellbeing_titles)
-    web_visits['is_clinical'] = web_visits['title'].isin(clinical_titles)
-
-    # if one of the category columns is True, is_health_related is True
-
-    web_visits['is_health_related'] = web_visits[['is_diet', 'is_physical_activity', 'is_sleep', 'is_resilience', 'is_clinical']].any(axis=1)
     
-    # Aggregate by member
-    web_features = web_visits.groupby('member_id').agg({
-        'is_diet': 'sum',
-        'is_physical_activity': 'sum',
-        'is_sleep': 'sum',
-        'is_resilience': 'sum',
-        'is_clinical': 'sum',
-        'is_health_related': 'sum',
-        'member_id': 'count'  # Count total visits
-    }).rename(columns={
-        'is_diet': 'diet_visits',
-        'is_physical_activity': 'physical_activity_visits',
-        'is_sleep': 'sleep_visits',
-        'is_resilience': 'resilience_visits',
-        'is_clinical': 'clinical_visits',
-        'is_health_related': 'total_health_visits',
-        'member_id': 'total_visits'
-    }).reset_index()
+    # diet_titles = [
+    #     'High-fiber meals', 
+    #     'Cholesterol friendly foods', 
+    #     'Mediterranean diet',
+    #     'Healthy eating guide', 
+    #     'Weight management'
+    # ]
+
+    # physical_activity_titles = [
+    #     'Aerobic exercise',
+    #     'Exercise routines', 
+    #     'Strength training basics', 
+    #     'Cardio workouts'
+    # ]
+
+    # sleep_health_titles = [
+    #     'Restorative sleep tips', 
+    #     'Sleep hygiene'
+    # ]
+
+    # resilience_wellbeing_titles = [
+    #     'Stress reduction',
+    #     'Meditation guide'
+    # ]
+
+    # clinical_titles = [
+    #     'Diabetes management',
+    #     'Hypertension basics',
+    #     'Lowering blood pressure',
+    #     'Cardiometabolic health',
+    #     'HbA1c targets'
+    # ]
+
+    # # Create category columns
+    # web_visits['is_diet'] = web_visits['title'].isin(diet_titles)
+    # web_visits['is_physical_activity'] = web_visits['title'].isin(physical_activity_titles)
+    # web_visits['is_sleep'] = web_visits['title'].isin(sleep_health_titles)
+    # web_visits['is_resilience'] = web_visits['title'].isin(resilience_wellbeing_titles)
+    # web_visits['is_clinical'] = web_visits['title'].isin(clinical_titles)
+
+    # # if one of the category columns is True, is_health_related is True
+
+    # web_visits['is_health_related'] = web_visits[['is_diet', 'is_physical_activity', 'is_sleep', 'is_resilience', 'is_clinical']].any(axis=1)
     
-    # Convert counts to ratios (except total_visits)
-    ratio_columns = [
-        'diet_visits', 
-        'physical_activity_visits', 
-        'sleep_visits', 
-        'resilience_visits', 
-        'clinical_visits', 
-        'total_health_visits'
-    ]
+    # # Aggregate by member
+    # web_features = web_visits.groupby('member_id').agg({
+    #     'is_diet': 'sum',
+    #     'is_physical_activity': 'sum',
+    #     'is_sleep': 'sum',
+    #     'is_resilience': 'sum',
+    #     'is_clinical': 'sum',
+    #     'is_health_related': 'sum',
+    #     'member_id': 'count'  # Count total visits
+    # }).rename(columns={
+    #     'is_diet': 'diet_visits',
+    #     'is_physical_activity': 'physical_activity_visits',
+    #     'is_sleep': 'sleep_visits',
+    #     'is_resilience': 'resilience_visits',
+    #     'is_clinical': 'clinical_visits',
+    #     'is_health_related': 'total_health_visits',
+    #     'member_id': 'total_visits'
+    # }).reset_index()
     
-    for col in ratio_columns:
-        web_features[f"{col}_ratio"] = web_features[col] / web_features['total_visits']
+    # # Convert counts to ratios (except total_visits)
+    # ratio_columns = [
+    #     'diet_visits', 
+    #     'physical_activity_visits', 
+    #     'sleep_visits', 
+    #     'resilience_visits', 
+    #     'clinical_visits', 
+    #     'total_health_visits'
+    # ]
+    
+    # for col in ratio_columns:
+    #     web_features[f"{col}_ratio"] = web_features[col] / web_features['total_visits']
     
 
-    # Calculate non-relevant visits and ratio
-    web_features['non_relevant_visits'] = (
-        web_features['total_visits'] - web_features['total_health_visits']
-    )
+    # # Calculate non-relevant visits and ratio
+    # web_features['non_relevant_visits'] = (
+    #     web_features['total_visits'] - web_features['total_health_visits']
+    # )
 
-    web_features['health_engagement_ratio'] = (
-        web_features['total_health_visits'] / web_features['total_visits']
-    )
+    # web_features['health_engagement_ratio'] = (
+    #     web_features['total_health_visits'] / web_features['total_visits']
+    # )
 
-    # Add category diversity
-    web_features['category_diversity'] = (
-        (web_features['diet_visits'] > 0).astype(int) +
-        (web_features['physical_activity_visits'] > 0).astype(int) +
-        (web_features['sleep_visits'] > 0).astype(int) +
-        (web_features['resilience_visits'] > 0).astype(int) +
-        (web_features['clinical_visits'] > 0).astype(int)
-    )
+    # # Add category diversity
+    # web_features['category_diversity'] = (
+    #     (web_features['diet_visits'] > 0).astype(int) +
+    #     (web_features['physical_activity_visits'] > 0).astype(int) +
+    #     (web_features['sleep_visits'] > 0).astype(int) +
+    #     (web_features['resilience_visits'] > 0).astype(int) +
+    #     (web_features['clinical_visits'] > 0).astype(int)
+    # )
 
-    return web_features
+    # return web_features
+    df = pd.get_dummies(web_visits, columns=['title'], drop_first=True)
+    dummy_cols  = [col for col in df.columns if col.startswith('title_')]
+    df = df.groupby('member_id').agg(
+        **{col: ('title_' + col.split('_', 1)[1], 'sum') for col in dummy_cols},
+        total_visits = ('member_id', 'count' )
+    ).reset_index()
+    # drop all unrelated titles
+    unrelated_titles = set(df.columns) - set(['member_id', 'total_visits']) - set(['title_' + title for title in related_titles])
+    df.drop(columns=unrelated_titles, inplace=True)
+    
+    return df
+    
 
 def feature_extract_app_usage(path='data/app_usage.csv'):
     """
